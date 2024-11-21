@@ -32,21 +32,35 @@ app.get('/api/movies', (req, res) => {
 app.post('/api/chat', (req, res) => {
   const userMessage = req.body.message.toLowerCase();
   let botResponse = '';
+  let movieQuery = null;
 
-  // Lógica simple del chatbot
-  if (userMessage.includes('mejor película') || userMessage.includes('top película') || userMessage.includes('mejor pelicula')) {
-    const query = 'SELECT titulo FROM peliculas ORDER BY calificacion DESC LIMIT 1';
-    db.query(query, (err, result) => {
+  if (userMessage.includes('mejor película') || userMessage.includes('top película') || userMessage.includes('mejor pelicula') || userMessage.includes('mejor calificada') 
+    || userMessage.includes('mayor calificacion') || userMessage.includes('mayor calificación')) {
+    movieQuery = 'SELECT * FROM peliculas ORDER BY calificacion DESC LIMIT 1';
+    botResponse = 'La mejor película navideña según nuestros datos es:';
+  } else if (userMessage.includes('recomendar') || userMessage.includes('sugerir') || userMessage.includes('sugiereme') || userMessage.includes('sugiéreme') 
+    || userMessage.includes('recomiéndame') || userMessage.includes('recomiendame')) {
+    movieQuery = 'SELECT * FROM peliculas ORDER BY RAND() LIMIT 1';
+    botResponse = 'Te recomiendo ver:';
+  } else if (userMessage.includes('peor película') || userMessage.includes('peor calificada') || userMessage.includes('peor pelicula')
+    || userMessage.includes('menor calificacion') || userMessage.includes('menor calificación')) {
+    movieQuery = 'SELECT * FROM peliculas ORDER BY calificacion ASC LIMIT 1';
+    botResponse = 'La película navideña con menor calificación según nuestros datos es:';
+  } else {
+    movieQuery = 'SELECT * FROM peliculas WHERE LOWER(titulo) LIKE ?';
+    botResponse = 'He encontrado información sobre la película:';
+  }
+
+  if (movieQuery) {
+    db.query(movieQuery, [`%${userMessage}%`], (err, result) => {
       if (err) throw err;
-      botResponse = `La mejor película navideña según nuestras calificaciones es: ${result[0].titulo}`;
-      res.json({ message: botResponse });
-    });
-  } else if (userMessage.includes('recomendar') || userMessage.includes('sugerir')) {
-    const query = 'SELECT titulo FROM peliculas ORDER BY RAND() LIMIT 1';
-    db.query(query, (err, result) => {
-      if (err) throw err;
-      botResponse = `Te recomiendo ver: ${result[0].titulo}. ¡Es una excelente película navideña!`;
-      res.json({ message: botResponse });
+      if (result.length > 0) {
+        botResponse += ` "${result[0].titulo}".`;
+        res.json({ message: botResponse, movie: result[0] });
+      } else {
+        botResponse = 'Lo siento, no pude encontrar información sobre esa película.';
+        res.json({ message: botResponse });
+      }
     });
   } else {
     botResponse = 'Lo siento, no entiendo tu pregunta. ¿Puedes ser más específico sobre qué quieres saber de las películas navideñas?';
@@ -54,10 +68,9 @@ app.post('/api/chat', (req, res) => {
   }
 });
 
-// Ruta para la página principal
 app.get('/', (req, res) => {
-    res.send('Bienvenido al servidor de WastiBot');
-  });
+  res.send('Bienvenido al servidor de WastiBot');
+});
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
