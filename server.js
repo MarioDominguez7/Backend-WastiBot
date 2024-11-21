@@ -34,7 +34,7 @@ app.post('/api/chat', (req, res) => {
   let botResponse = '';
 
   // Lógica simple del chatbot
-  if (userMessage.includes('mejor película') || userMessage.includes('top película')) {
+  if (userMessage.includes('mejor película') || userMessage.includes('top película') || userMessage.includes('mejor pelicula')) {
     const query = 'SELECT titulo FROM peliculas ORDER BY calificacion DESC LIMIT 1';
     db.query(query, (err, result) => {
       if (err) throw err;
