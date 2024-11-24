@@ -74,7 +74,7 @@ app.post('/api/chat', (req, res) => {
       if (result.length > 0) {
         const movie = result[0];
         currentMovie = movie.titulo;
-        botResponse += ` "${movie.titulo}".`;
+        botResponse += ` "<b>${movie.titulo}</b>".`;
         
         switch (movieContext) {
           case 'mejor':
@@ -91,7 +91,7 @@ app.post('/api/chat', (req, res) => {
             break;
         }
         
-        botResponse += ` ¿Qué te gustaría saber sobre esta película? Puedes preguntar sobre el año, director, calificación, género o trama.`;
+        botResponse += ` ¿Qué te gustaría saber sobre esta película? Puedes preguntar sobre el año, director, calificación, género, trama o dónde verla.`;
         
         res.json({ 
           message: botResponse, 
@@ -102,7 +102,8 @@ app.post('/api/chat', (req, res) => {
             director: movie.director,
             calificacion: movie.calificacion,
             subgenero: movie.subgenero,
-            descripcion: movie.descripcion
+            descripcion: movie.descripcion,
+            donde_ver: movie.donde_ver
           },
           movieContext: movieContext
         });
@@ -127,8 +128,8 @@ function handleMovieInfoRequest(userMessage, res) {
     infoType = 'calificación';
   } else if (userMessage.includes('género') || userMessage.includes('tipo')) {
     infoType = 'género';
-  } else if (userMessage.includes('trama') || userMessage.includes('historia')) {
-    infoType = 'trama';
+  } else if (userMessage.includes('dónde ver') || userMessage.includes('donde ver') || userMessage.includes('plataformas')) {
+    infoType = 'donde_ver';
   }
 
   const query = 'SELECT * FROM peliculas WHERE titulo = ?';
@@ -143,24 +144,52 @@ function handleMovieInfoRequest(userMessage, res) {
       let response = '';
       switch (infoType) {
         case 'año':
-          response = `"${movie.titulo}" se estrenó en el año ${movie.anio}.`;
+          response = `"<b>${movie.titulo}</b>" se estrenó en el año ${movie.anio}.`;
           break;
         case 'director':
-          response = `"${movie.titulo}" fue dirigida por ${movie.director}.`;
+          response = `"<b>${movie.titulo}</b>" fue dirigida por ${movie.director}.`;
           break;
         case 'calificación':
-          response = `"${movie.titulo}" tiene una calificación de ${movie.calificacion} sobre 10.`;
+          response = `"<b>${movie.titulo}</b>" tiene una calificación de ${movie.calificacion} sobre 10.`;
           break;
         case 'género':
-          response = `"${movie.titulo}" pertenece al subgénero de ${movie.subgenero}.`;
+          response = `"<b>${movie.titulo}</b>" pertenece al subgénero de ${movie.subgenero}.`;
           break;
         case 'trama':
-          response = `La trama de "${movie.titulo}" es: ${movie.descripcion}`;
+          response = `La trama de "<b>${movie.titulo}</b>" es: ${movie.descripcion}`;
           break;
+          case 'donde_ver':
+            if (movie.donde_ver) {
+              // Convierte la lista de plataformas y enlaces en HTML con hipervínculos
+              const plataformas = movie.donde_ver
+                .split('\n') // Si los datos están separados por saltos de línea
+                .map(plataforma => {
+                  const [nombre, url] = plataforma.split(': '); // Divide el nombre y el link
+                  return `<a href="${url.trim()}" target="_blank">${nombre.trim()}</a>`; // Formatea como hipervínculo
+                })
+                .join(', <br>'); // Une las plataformas con comas
+              response = `"<b>${movie.titulo}</b>" está disponible en las siguientes plataformas: <br>${plataformas}.`;
+            } else {
+              response = `"<b>${movie.titulo}</b>" no tiene información sobre dónde verla actualmente.`;
+            }
+            break;
         default:
-          response = `"${movie.titulo}" es una película navideña del año ${movie.anio}, dirigida por ${movie.director}. Tiene una calificación de ${movie.calificacion} sobre 10 y pertenece al subgénero de ${movie.subgenero}. ¿Qué más te gustaría saber sobre ella?`;
+          // Divide la información de las plataformas en un array 
+          const platforms = movie.donde_ver.split('\n'); 
+          
+          // Crea una lista formateada con hipervínculos
+          const formattedPlatforms = platforms.map((platform) => {
+            const [name, url] = platform.split(': '); // Divide entre nombre de la plataforma y el link
+            return `<a href="${url}" target="_blank">${name}</a>`;
+          }).join(', <br>'); // Separa cada plataforma con un salto de línea
+          
+          // Genera la respuesta con la lista de plataformas formateadas
+          response = `"<b>${movie.titulo}</b>" es una película navideña del año ${movie.anio}, dirigida por ${movie.director}. 
+                      Tiene una calificación de ${movie.calificacion} sobre 10 y pertenece al subgénero de ${movie.subgenero}. 
+                      Puedes verla en las siguientes plataformas:<br>${formattedPlatforms}. 
+                      <br> ¿Qué más te gustaría saber sobre ella?`;
       }
-      response += ' ¿Quieres saber algo más sobre esta película o prefieres que hablemos de otra?';
+      response += ' <br>¿Quieres saber algo más sobre esta película o prefieres que hablemos de otra?';
       res.json({ message: response, movie: movie, movieContext: 'info' });
     } else {
       res.json({ message: 'Lo siento, no pude encontrar información sobre esa película.' });
