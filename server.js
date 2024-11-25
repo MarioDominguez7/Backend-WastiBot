@@ -35,7 +35,7 @@ let currentMovie = null;
 const keywordMap = {
   greetings: ['hola', 'saludos', 'holi', 'ola', 'holiwis'],
   thanks: ['gracias', 'muchas gracias'],
-  farewell: ['adios', 'adiós', 'hasta luego', 'ya no', 'nos vemos', 'ahí te ves','ahi te ves', 'eso es todo'],
+  farewell: ['adios', 'adiós', 'hasta luego', 'ya no', 'nos vemos', 'ahí te ves','ahi te ves', 'es todo'],
   changeMovie: ['otra película', 'segunda opción', 'cambiemos', 'cambia', 'de otra', 'otra pelicula', 'la 2', 'segunda opcion', 'la segunda', 'la dos', 'cambiemos', 'cambia'],
   bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mejor calificacion','mejor calificación','mayor rating', 'top 1','top uno', 'alta calificada','alta calificación','alta calificacion', 'mayor puntuación','mayor puntuacion', 'mayor puntaje', 'alto puntaje','más alta','más alto','mas alta','mas alto', 'la mejor'],
   worstMovie: ['peor película','peor pelicula','peor calificada', 'menor calificacion', 'menor calificación','menor rating','más baja','más bajo','mas baja','mas bajo', 'menor puntaje', 'menor puntuación','menor puntuacion', 'bajo puntuaje', 'la peor'],
