@@ -1,3 +1,6 @@
+/*--------------------------------------------------------------
+# Constantes
+--------------------------------------------------------------*/
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -7,6 +10,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+/*--------------------------------------------------------------
+# Conexión a bd
+--------------------------------------------------------------*/
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -23,6 +29,9 @@ db.connect((err) => {
 
 let currentMovie = null;
 
+/*--------------------------------------------------------------
+# Declaración de palabras clave
+--------------------------------------------------------------*/
 const keywordMap = {
   greetings: ['hola', 'saludos', 'holi', 'ola', 'holiwis'],
   thanks: ['gracias', 'muchas gracias'],
@@ -39,7 +48,9 @@ const keywordMap = {
 };
 
 
-// Middleware para manejar solicitudes
+/*--------------------------------------------------------------
+# Middleware para manejar solicitudes
+--------------------------------------------------------------*/
 app.post('/api/chat', (req, res) => {
   const userMessage = req.body.message.toLowerCase();
   let botResponse = '';
@@ -74,14 +85,14 @@ app.post('/api/chat', (req, res) => {
     return res.json({ message: botResponse, endConversation: true });
   }
 
-  // Si el usuario quiere hablar de otra película
+  // Cambiar de película
   if (matchKeywords(userMessage, keywordMap.changeMovie)) {
     currentMovie = null; 
     botResponse = 'Claro, cambiemos de tema. ¿Quieres que te recomiende una película o tienes alguna en mente?';
     return res.json({ message: botResponse, endConversation: false });
   } 
 
-  // Iniciar para recomendar película
+  // Recomendar película
   if (matchKeywords(userMessage, keywordMap.bestMovie)) {
     movieQuery = 'SELECT * FROM peliculas ORDER BY calificacion DESC LIMIT 1';
     movieContext = 'mejor';
@@ -103,6 +114,9 @@ app.post('/api/chat', (req, res) => {
     botResponse = 'He encontrado información sobre la película:';
   }
 
+/*--------------------------------------------------------------
+# Manejador de Contextos
+--------------------------------------------------------------*/
   if (movieQuery) {
     db.query(movieQuery, queryParams, (err, result) => {
       if (err) {
@@ -156,6 +170,9 @@ app.post('/api/chat', (req, res) => {
   }
 });
 
+/*--------------------------------------------------------------
+# Manejador de los detalles a mostrar de la película
+--------------------------------------------------------------*/
 function handleMovieInfoRequest(userMessage, res) {
   let infoType = 'general';
   if (matchKeywords(userMessage, keywordMap.year)) {
@@ -217,6 +234,10 @@ function handleMovieInfoRequest(userMessage, res) {
   });
 }
 
+/*--------------------------------------------------------------
+# Funciones
+--------------------------------------------------------------*/
+
 // Función para formatear plataformas y agregarlas como links
 function formatPlatforms(donde_ver) {
   return donde_ver
@@ -233,5 +254,8 @@ function matchKeywords(message, keywords) {
   return keywords.some((keyword) => message.includes(keyword));
 }
 
+/*--------------------------------------------------------------
+# Determinar puerto para la bd
+--------------------------------------------------------------*/
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
