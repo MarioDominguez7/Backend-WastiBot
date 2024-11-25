@@ -37,7 +37,7 @@ const keywordMap = {
   thanks: ['gracias', 'muchas gracias'],
   farewell: ['adios', 'adiós', 'hasta luego', 'ya no', 'nos vemos', 'ahí te ves','ahi te ves', 'eso es todo'],
   changeMovie: ['otra película', 'segunda opción', 'cambiemos', 'cambia', 'de otra', 'otra pelicula', 'la 2', 'segunda opcion', 'la segunda', 'la dos', 'cambiemos', 'cambia'],
-  bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mejor calificacion','mejor calificación','mayor rating', 'top 1','top uno'],
+  bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mejor calificacion','mejor calificación','mayor rating', 'top 1','top uno', 'alta calificada','alta calificación','alta calificacion'],
   worstMovie: ['peor película','peor pelicula','peor calificada', 'menor calificacion', 'menor calificación','menor rating','más baja','más bajo','mas baja','mas bajo'],
   recommend: ['recomendar', 'sugerir','sugieres','sugiereme', 'sugiéreme','recomiéndame','recomiendame','recomiendas','cuál puedo ver', 'cual puedo ver','dime otra', 'dime una', 'dime 1','sugiere', 'dime sobre otra','cuéntame sobre una', 'cuentame sobre una', 'cuéntame sobre otra', 'cuentame sobre otra'],
   listMovies: ['cuáles', 'cuales ', 'qué opciones hay', 'que opciones hay','muestra todas', 'todas', 'películas conoces', 'peliculas conoces'],
