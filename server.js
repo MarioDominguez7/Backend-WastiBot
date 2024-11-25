@@ -1,6 +1,3 @@
-/* --------------------------
-#  DECLARACION DE CONSTANTES
------------------------------ */
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -26,6 +23,23 @@ db.connect((err) => {
 
 let currentMovie = null;
 
+const keywordMap = {
+  greetings: ['hola', 'saludos', 'holi', 'ola', 'holiwis'],
+  thanks: ['gracias', 'muchas gracias'],
+  farewell: ['adios', 'adiós', 'hasta luego', 'no'],
+  changeMovie: ['otra película', 'segunda opción', 'cambiemos', 'cambia', 'de otra', 'otra pelicula', 'la 2', 'segunda opcion', 'la segunda', 'la dos', 'cambiemos', 'cambia'],
+  bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mayor rating', 'top 1','top uno'],
+  worstMovie: ['peor película','peor pelicula','peor calificada', 'menor calificacion', 'menor calificación','menor rating','más baja','más bajo','mas baja','mas bajo'],
+  recommend: ['recomendar', 'sugerir','sugieres','sugiereme', 'sugiéreme','recomiéndame','recomiendame','recomiendas','puedo ver','dime otra', 'dime una', 'dime 1','sugiere'],
+  year: ['año','cuando','cuándo'],
+  director: ['director','dirigió','dirigio', 'principal encargado', 'principal encargada'],
+  rating: ['calificación','calificacion','rating'],
+  gender: ['género','genero','tipo'],
+  plataforms: ['dónde ver', 'donde ver', 'plataformas','plataforma','streaming','donde la puedo ver','dónde la puedo ver', 'donde puedo verla','dónde puedo verla'],
+};
+
+
+// Middleware para manejar solicitudes
 app.post('/api/chat', (req, res) => {
   const userMessage = req.body.message.toLowerCase();
   let botResponse = '';
@@ -37,63 +51,46 @@ app.post('/api/chat', (req, res) => {
   // Detectar saludos, agradecimiento o despedida
   if (conversationEnded) {
     if (
-      userMessage.includes('hola') ||
-      userMessage.includes('saludos') ||
-      userMessage.includes('holi') ||
-      userMessage.includes('ola') ||
-      userMessage.includes('holiwis')
+      matchKeywords(userMessage, keywordMap.greetings)
     ) {
       conversationEnded = false; 
       botResponse = '¡Hola! Soy WastiBot, tu asistente para películas navideñas. ¿En qué puedo ayudarte hoy?';
-    } else {
-      botResponse = '¿Sigues ahí? :o ¿Quieres saber sobre alguna otra película?';
-    }
+    } 
     return res.json({ message: botResponse, endConversation: false });
   }
-  
   if (
-    userMessage.includes('hola') ||
-    userMessage.includes('saludos') ||
-    userMessage.includes('holi') ||
-    userMessage.includes('ola') ||
-    userMessage.includes('holiwis')
+    matchKeywords(userMessage, keywordMap.greetings)
   ) {
     botResponse = '¡Hola de nuevo! ¿Te puedo ayudar con algo más sobre películas navideñas?';
     return res.json({ message: botResponse, endConversation: false });
   }
-
-  if (userMessage.includes('muchas gracias') || userMessage.includes('gracias')) {
+  if (matchKeywords(userMessage, keywordMap.thanks)) {
     currentMovie = null;
     botResponse = 'Me alegro de haber sido de ayuda. ¿Quieres que te hable de otra película navideña?';
     return res.json({ message: botResponse, endConversation: false });
-  } else if (userMessage.includes('adios') || userMessage.includes('adiós') || userMessage.includes('hasta luego')) { 
+  } else if (matchKeywords(userMessage, keywordMap.farewell)) { 
     conversationEnded = true;
-    botResponse = '¡Hasta luego! Espero que hayas disfrutado nuestra conversación sobre películas navideñas. <br>¡Vuelve pronto! ヾ(￣▽￣)';
+    botResponse = 'Ok ¡Hasta luego! Espero que hayas disfrutado nuestra conversación sobre películas navideñas. <br>¡Vuelve pronto! ヾ(￣▽￣)';
     return res.json({ message: botResponse, endConversation: true });
   }
 
   // Si el usuario quiere hablar de otra película
-  if (userMessage.includes('de otra') || userMessage.includes('otra película') || userMessage.includes('otra pelicula') || userMessage.includes('segunda opción') || userMessage.includes('segunda opcion') || userMessage.includes('la 2') || userMessage.includes('la segunda')  || userMessage.includes('la dos') || userMessage.includes('cambiemos') || userMessage.includes('cambia')) {
+  if (matchKeywords(userMessage, keywordMap.changeMovie)) {
     currentMovie = null; 
     botResponse = 'Claro, cambiemos de tema. ¿Quieres que te recomiende una película o tienes alguna en mente?';
     return res.json({ message: botResponse, endConversation: false });
   } 
 
   // Iniciar para recomendar película
-  if (userMessage.includes('mejor película') || userMessage.includes('top película') || userMessage.includes('mejor pelicula') || userMessage.includes('mejor calificada') || userMessage.includes('top pelicula')
-    || userMessage.includes('mayor calificacion') || userMessage.includes('mayor calificación') || userMessage.includes('mayor rating') || userMessage.includes('top 1') || userMessage.includes('top uno')) {
+  if (matchKeywords(userMessage, keywordMap.bestMovie)) {
     movieQuery = 'SELECT * FROM peliculas ORDER BY calificacion DESC LIMIT 1';
     movieContext = 'mejor';
     botResponse = 'La mejor película navideña según nuestros datos es:';
-  } else if (userMessage.includes('recomendar') || userMessage.includes('sugerir') || userMessage.includes('sugieres') || userMessage.includes('sugiereme') || userMessage.includes('sugiéreme') 
-    || userMessage.includes('recomiéndame') || userMessage.includes('recomiendame') || userMessage.includes('recomiendas') || userMessage.includes('puedo ver') || userMessage.includes('dime otra') 
-    || userMessage.includes('dime una') || userMessage.includes('dime 1') || userMessage.includes('dime otra') || userMessage.includes('sugiere')) {
+  } else if (matchKeywords(userMessage, keywordMap.recommend)) {
     movieQuery = 'SELECT * FROM peliculas ORDER BY RAND() LIMIT 1';
     movieContext = 'recomendación';
     botResponse = 'Te recomiendo ver:';
-  } else if (userMessage.includes('peor película') || userMessage.includes('top película') || userMessage.includes('peor calificada') || userMessage.includes('peor pelicula')
-    || userMessage.includes('menor calificacion') || userMessage.includes('menor calificación') || userMessage.includes('menor rating') || userMessage.includes('más baja') || userMessage.includes('más bajo')
-    || userMessage.includes('mas baja') || userMessage.includes('mas bajo')) {
+  } else if (matchKeywords(userMessage, keywordMap.worstMovie)) {
     movieQuery = 'SELECT * FROM peliculas ORDER BY calificacion ASC LIMIT 1';
     movieContext = 'peor';
     botResponse = 'La película navideña con menor calificación según nuestros datos es:';
@@ -133,7 +130,7 @@ app.post('/api/chat', (req, res) => {
             break;
         }
         
-        botResponse += ` <br> ¿Qué te gustaría saber sobre esta película? Puedes preguntar sobre el año, director, calificación, género, trama o dónde verla.`;
+        botResponse += ` <br> ¿Qué te gustaría saber sobre esta película? Puedes preguntar sobre el <u>año</u>, <u>director</u>, <u>calificación</u>, <u>género</u>, <u>trama</u> o <u>dónde verla</u>.`;
         
         res.json({ 
           message: botResponse, 
@@ -155,22 +152,21 @@ app.post('/api/chat', (req, res) => {
       }
     });
   } else {
-    botResponse = generateGenericResponse(userMessage);
-    res.json({ message: botResponse });
+    res.json({ message: '¿Puedes ser más específico? Puedo ayudarte con recomendaciones o detalles sobre películas navideñas.'});
   }
 });
 
 function handleMovieInfoRequest(userMessage, res) {
   let infoType = 'general';
-  if (userMessage.includes('año') || userMessage.includes('cuando') || userMessage.includes('cuándo')) {
+  if (matchKeywords(userMessage, keywordMap.year)) {
     infoType = 'año';
-  } else if (userMessage.includes('director') || userMessage.includes('dirigió') || userMessage.includes('dirigio')) {
+  } else if (matchKeywords(userMessage, keywordMap.director)) {
     infoType = 'director';
-  } else if (userMessage.includes('calificación') || userMessage.includes('calificacion') || userMessage.includes('rating')) {
+  } else if (matchKeywords(userMessage, keywordMap.rating)) {
     infoType = 'calificación';
-  } else if (userMessage.includes('género') || userMessage.includes('genero') || userMessage.includes('tipo')) {
+  } else if (matchKeywords(userMessage, keywordMap.gender)) {
     infoType = 'género';
-  } else if (userMessage.includes('dónde ver') || userMessage.includes('donde ver') || userMessage.includes('plataformas') || userMessage.includes('plataforma') || userMessage.includes('streaming') || userMessage.includes('donde la puedo ver') || userMessage.includes('dónde la puedo ver') || userMessage.includes('donde puedo verla') || userMessage.includes('dónde puedo verla')) {
+  } else if (matchKeywords(userMessage, keywordMap.plataforms)) {
     infoType = 'donde_ver';
   }
 
@@ -208,10 +204,10 @@ function handleMovieInfoRequest(userMessage, res) {
             }
             break;
         default:
-          response = `"<b>${movie.titulo}</b>" es una película navideña del año ${movie.anio}, dirigida por ${movie.director}. 
-                      Tiene una calificación de ${movie.calificacion} sobre 10 y pertenece al subgénero de ${movie.subgenero}. 
-                      Puedes verla en las siguientes plataformas:<br>${formatPlatforms( movie.donde_ver )}. 
-                      <br> ¿Qué más te gustaría saber sobre ella?`;
+          response = `"<b>${movie.titulo}</b>" es una película navideña del año <b>${movie.anio}</b>.<br>
+            Fue dirigida por <b>${movie.director}</b>.<br> 
+            Tiene una calificación de <b>${movie.calificacion}</b> sobre 10 y pertenece al subgénero de <b>${movie.subgenero}</b>. <br>
+            Puedes verla en las siguientes plataformas:<br>${formatPlatforms( movie.donde_ver )}.`;
       }
       response += ' <br>¿Quieres saber algo más sobre esta película o prefieres que hablemos de otra?';
       res.json({ message: response, movie: movie, movieContext: 'info' });
@@ -232,14 +228,9 @@ function formatPlatforms(donde_ver) {
     .join(", <br>");
 }
 
-function generateGenericResponse(message) {
-  if (message.includes('hola') || message.includes('saludos')) {
-    return '¡Hola! Soy WastiBot, tu asistente para películas navideñas. ¿En qué puedo ayudarte hoy?';
-  } else if (message.includes('gracias')) {
-    return '¡De nada! Estoy aquí para ayudarte con cualquier pregunta sobre películas navideñas.';
-  } else {
-    return '¿Puedes ser más específico? Puedo ayudarte con información sobre películas navideñas, recomendaciones, o responder preguntas sobre una película en particular.';
-  }
+// Coincidencia de palabras clave
+function matchKeywords(message, keywords) {
+  return keywords.some((keyword) => message.includes(keyword));
 }
 
 const PORT = 3000;
