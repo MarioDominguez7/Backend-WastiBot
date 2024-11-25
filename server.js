@@ -35,16 +35,17 @@ let currentMovie = null;
 const keywordMap = {
   greetings: ['hola', 'saludos', 'holi', 'ola', 'holiwis'],
   thanks: ['gracias', 'muchas gracias'],
-  farewell: ['adios', 'adiós', 'hasta luego', 'no'],
+  farewell: ['adios', 'adiós', 'hasta luego', 'ya no', 'nos vemos', 'ahí te ves','ahi te ves', 'eso es todo'],
   changeMovie: ['otra película', 'segunda opción', 'cambiemos', 'cambia', 'de otra', 'otra pelicula', 'la 2', 'segunda opcion', 'la segunda', 'la dos', 'cambiemos', 'cambia'],
   bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mejor calificacion','mejor calificación','mayor rating', 'top 1','top uno'],
   worstMovie: ['peor película','peor pelicula','peor calificada', 'menor calificacion', 'menor calificación','menor rating','más baja','más bajo','mas baja','mas bajo'],
-  recommend: ['recomendar', 'sugerir','sugieres','sugiereme', 'sugiéreme','recomiéndame','recomiendame','recomiendas','cuál puedo ver', 'cual puedo ver','dime otra', 'dime una', 'dime 1','sugiere'],
+  recommend: ['recomendar', 'sugerir','sugieres','sugiereme', 'sugiéreme','recomiéndame','recomiendame','recomiendas','cuál puedo ver', 'cual puedo ver','dime otra', 'dime una', 'dime 1','sugiere', 'dime sobre otra','cuéntame sobre una', 'cuentame sobre una', 'cuéntame sobre otra', 'cuentame sobre otra'],
   listMovies: ['cuáles', 'cuales ', 'qué opciones hay', 'que opciones hay','muestra todas', 'todas', 'películas conoces', 'peliculas conoces'],
   year: ['año','cuando','cuándo'],
   director: ['director','dirigió','dirigio', 'principal encargado', 'principal encargada'],
   rating: ['calificación','calificacion','rating'],
   gender: ['género','genero','tipo'],
+  description: ['trama','qué trata','que trata','qué se trata','que se trata','descripción','descríbemela', 'descríbela','describemela', 'describela', 'plot'],
   plataforms: ['dónde ver', 'donde ver', 'plataformas','plataforma','streaming','donde la puedo ver','dónde la puedo ver', 'donde puedo verla','dónde puedo verla','donde la veo','dónde la veo'],
 };
 
@@ -184,6 +185,8 @@ function handleMovieInfoRequest(userMessage, res) {
     infoType = 'calificación';
   } else if (matchKeywords(userMessage, keywordMap.gender)) {
     infoType = 'género';
+  } else if (matchKeywords(userMessage, keywordMap.description)) {
+    infoType = 'trama';
   } else if (matchKeywords(userMessage, keywordMap.plataforms)) {
     infoType = 'donde_ver';
   }
@@ -200,19 +203,19 @@ function handleMovieInfoRequest(userMessage, res) {
       let response = '';
       switch (infoType) {
         case 'año':
-          response = `"<b>${movie.titulo}</b>" se estrenó en el año ${movie.anio}.`;
+          response = `"<b>${movie.titulo}</b>" se estrenó en el año <b>${movie.anio}</b>.`;
           break;
         case 'director':
-          response = `"<b>${movie.titulo}</b>" fue dirigida por ${movie.director}.`;
+          response = `"<b>${movie.titulo}</b>" fue dirigida por <b>${movie.director}</b>.`;
           break;
         case 'calificación':
-          response = `"<b>${movie.titulo}</b>" tiene una calificación de ${movie.calificacion} sobre 10.`;
+          response = `"<b>${movie.titulo}</b>" tiene una calificación de <b>${movie.calificacion}</b> sobre 10.`;
           break;
         case 'género':
-          response = `"<b>${movie.titulo}</b>" pertenece al subgénero de ${movie.subgenero}.`;
+          response = `"<b>${movie.titulo}</b>" pertenece al subgénero de <b>${movie.subgenero}</b>.`;
           break;
         case 'trama':
-          response = `La trama de "<b>${movie.titulo}</b>" es: ${movie.descripcion}`;
+          response = `La película de "<b>${movie.titulo}</b>" trata de lo siguiente: <br> ${movie.descripcion} <br>`;
           break;
           case 'donde_ver':
             if (movie.donde_ver) {
@@ -222,12 +225,14 @@ function handleMovieInfoRequest(userMessage, res) {
             }
             break;
         default:
-          response = `"<b>${movie.titulo}</b>" es una película navideña del año <b>${movie.anio}</b>.<br>
+          response = `Aquí está toda la información sobre "<b>${movie.titulo}</b>". <br>  <br>
+            Esta es una película navideña del año <b>${movie.anio}</b>.<br>
             Fue dirigida por <b>${movie.director}</b>.<br> 
             Tiene una calificación de <b>${movie.calificacion}</b> sobre 10 y pertenece al subgénero de <b>${movie.subgenero}</b>. <br>
+            Su <b>trama</b> ve da lo siguiente: ${movie.descripcion} <br><br>
             Puedes verla en las siguientes plataformas:<br>${formatPlatforms( movie.donde_ver )}.`;
       }
-      response += ' <br>¿Quieres saber algo más sobre esta película o prefieres que hablemos de otra?';
+      response += ' <br>¿Quieres saber algo en concreto de esta película o prefieres que hablemos de otra?';
       res.json({ message: response, movie: movie, movieContext: 'info' });
     } else {
       res.json({ message: 'Lo siento, no pude encontrar información sobre esa película.' });
