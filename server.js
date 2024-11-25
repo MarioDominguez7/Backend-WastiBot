@@ -37,14 +37,15 @@ const keywordMap = {
   thanks: ['gracias', 'muchas gracias'],
   farewell: ['adios', 'adiós', 'hasta luego', 'no'],
   changeMovie: ['otra película', 'segunda opción', 'cambiemos', 'cambia', 'de otra', 'otra pelicula', 'la 2', 'segunda opcion', 'la segunda', 'la dos', 'cambiemos', 'cambia'],
-  bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mayor rating', 'top 1','top uno'],
+  bestMovie: ['mejor película','top película', 'mejor pelicula', 'mayor calificacion', 'mejor calificada','top pelicula', 'mayor calificacion','mayor calificación','mejor calificacion','mejor calificación','mayor rating', 'top 1','top uno'],
   worstMovie: ['peor película','peor pelicula','peor calificada', 'menor calificacion', 'menor calificación','menor rating','más baja','más bajo','mas baja','mas bajo'],
-  recommend: ['recomendar', 'sugerir','sugieres','sugiereme', 'sugiéreme','recomiéndame','recomiendame','recomiendas','puedo ver','dime otra', 'dime una', 'dime 1','sugiere'],
+  recommend: ['recomendar', 'sugerir','sugieres','sugiereme', 'sugiéreme','recomiéndame','recomiendame','recomiendas','cuál puedo ver', 'cual puedo ver','dime otra', 'dime una', 'dime 1','sugiere'],
+  listMovies: ['cuáles', 'cuales ', 'qué opciones hay', 'que opciones hay','muestra todas', 'todas', 'películas conoces', 'peliculas conoces'],
   year: ['año','cuando','cuándo'],
   director: ['director','dirigió','dirigio', 'principal encargado', 'principal encargada'],
   rating: ['calificación','calificacion','rating'],
   gender: ['género','genero','tipo'],
-  plataforms: ['dónde ver', 'donde ver', 'plataformas','plataforma','streaming','donde la puedo ver','dónde la puedo ver', 'donde puedo verla','dónde puedo verla'],
+  plataforms: ['dónde ver', 'donde ver', 'plataformas','plataforma','streaming','donde la puedo ver','dónde la puedo ver', 'donde puedo verla','dónde puedo verla','donde la veo','dónde la veo'],
 };
 
 
@@ -131,20 +132,20 @@ app.post('/api/chat', (req, res) => {
         
         switch (movieContext) {
           case 'mejor':
-            botResponse += ` Esta película tiene la calificación más alta de ${movie.calificacion}.`;
+            botResponse += ` Esta película tiene la calificación más alta de <b>${movie.calificacion}</b>, la mejor opción para ver según la crítica :o.`;
             break;
           case 'recomendación':
-            botResponse += ` Es una excelente elección para disfrutar en Navidad.`;
+            botResponse += ` Es una excelente elección para disfrutar en Navidad que seguro te gustará :D.`;
             break;
           case 'peor':
-            botResponse += ` Esta película tiene la calificación más baja de ${movie.calificacion}, pero quizás te sorprenda.`;
+            botResponse += ` Esta película tiene la calificación más baja de <b>${movie.calificacion}</b>, pero quizás te sorprenda c:`;
             break;
           case 'búsqueda':
-            botResponse += ` Esta película tiene una calificación de ${movie.calificacion}.`;
+            botResponse += ` He encontrado información de la película "<b>${movie.titulo}"</b>.`;
             break;
         }
         
-        botResponse += ` <br> ¿Qué te gustaría saber sobre esta película? Puedes preguntar sobre el <u>año</u>, <u>director</u>, <u>calificación</u>, <u>género</u>, <u>trama</u> o <u>dónde verla</u>.`;
+        botResponse += ` <br> ¿Qué te gustaría saber sobre esta película? Puedes preguntar sobre el <u>año</u>, <u>director</u>, <u>calificación</u>, <u>género</u>, <u>trama</u> o <u>dónde verla</u> ;)`;
         
         res.json({ 
           message: botResponse, 
@@ -161,7 +162,7 @@ app.post('/api/chat', (req, res) => {
           movieContext: movieContext
         });
       } else {
-        botResponse = 'Lo siento, no pude encontrar información sobre esa película. ¿Quieres que te hable de otra película navideña?';
+        botResponse = 'Lo siento, no pude encontrar información sobre esa película :c ¿Quieres que te hable de otra película navideña?';
         res.json({ message: botResponse });
       }
     });
