@@ -47,6 +47,8 @@ const keywordMap = {
   gender: ['género','genero','tipo','subgénero','subgenero'],
   description: ['trama','qué trata','que trata','qué se trata','que se trata','descripción','descríbemela', 'descríbela','describemela', 'describela', 'plot'],
   plataforms: ['dónde ver', 'donde ver', 'plataformas','plataforma','streaming','donde la puedo ver','dónde la puedo ver', 'donde puedo verla','dónde puedo verla','donde la veo','dónde la veo'],
+  sheloveme:['ella me ama', 'él me ama', 'el me ama',],
+  uloveme:['me amas', 'ser mi novio', 'ser mi novia', 'se mi novio', 'se mi novia'],
 };
 
 /*--------------------------------------------------------------
@@ -85,6 +87,18 @@ app.post('/api/chat', (req, res) => {
     botResponse = 'Ok ¡Hasta luego! Espero que hayas disfrutado nuestra conversación sobre películas navideñas. <br>¡Vuelve pronto! ヾ(￣▽￣)';
     return res.json({ message: botResponse, endConversation: true });
   }
+
+  // Graciosas
+  if (matchKeywords(userMessage, keywordMap.sheloveme)) {
+    currentMovie = null; 
+    botResponse = 'Lo siento, no tengo respuesta a eso :c. Pero estoy seguro que, si le recomiendas una buena película navideña, lo hará. Tu confía ;). <br> ¿Quieres que te ayude con una buena película navideña?';
+    return res.json({ message: botResponse, endConversation: false });
+  } 
+  if (matchKeywords(userMessage, keywordMap.uloveme)) {
+    currentMovie = null; 
+    botResponse = '😳 Vaya, eso fue inesperado. Lamentablemente, mi programación solo me permite amar a las películas navideñas. Pero con suerte tal vez tu también puedas amarlas tanto como yo :D. <br> ¿Te gustaría que te recomiende alguna? ';
+    return res.json({ message: botResponse, endConversation: false });
+  } 
 
   // Cambiar de película
   if (matchKeywords(userMessage, keywordMap.changeMovie)) {
