@@ -126,7 +126,7 @@ app.post('/api/chat', (req, res) => {
     movieQuery = 'SELECT * FROM peliculas WHERE LOWER(titulo) LIKE ?';
     queryParams.push(`%${userMessage}%`);
     movieContext = 'búsqueda';
-    botResponse = 'He encontrado información sobre la película:';
+    botResponse = 'Ok.';
   }
 
 /*--------------------------------------------------------------
